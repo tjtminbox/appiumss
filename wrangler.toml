@@ -1,0 +1,17 @@
+name = "screenshot-app"
+type = "webpack"
+account_id = "" # You'll add your Cloudflare account ID here
+workers_dev = true
+route = ""
+zone_id = "" # You'll add your zone ID here
+compatibility_date = "2024-01-08"
+
+[site]
+bucket = "./templates"
+entry-point = "workers-site"
+
+[env.production]
+name = "screenshot-app-prod"
+
+[env.staging]
+name = "screenshot-app-staging"

@@ -39,24 +39,16 @@ class MobileScreenshotClient:
 
     def setup_driver(self):
         try:
-            # Detect platform and set capabilities
-            if platform.system() == 'Darwin':  # macOS - assume iOS
-                self.platform = 'iOS'
-                caps = {
-                    'platformName': 'iOS',
-                    'automationName': 'XCUITest',
-                    'deviceName': self.device_name or 'iPhone',
-                    'udid': self.udid,
-                    'noReset': True
-                }
-            else:  # Assume Android
-                self.platform = 'Android'
-                caps = {
-                    'platformName': 'Android',
-                    'automationName': 'UiAutomator2',
-                    'deviceName': self.device_name or 'Android Device',
-                    'noReset': True
-                }
+            # Set Android capabilities
+            self.platform = 'Android'
+            caps = {
+                'platformName': 'Android',
+                'automationName': 'UiAutomator2',
+                'deviceName': self.device_name or 'Android Device',
+                'noReset': True,
+                'newCommandTimeout': 0,
+                'autoGrantPermissions': True
+            }
 
             if self.udid:
                 caps['udid'] = self.udid
@@ -107,8 +99,10 @@ class MobileScreenshotClient:
 
             logger.info("Screenshot client started successfully")
             
-            # Take initial screenshot
-            self.take_screenshot()
+            # Take screenshots every 5 seconds
+            while True:
+                self.take_screenshot()
+                time.sleep(5)
             
         except Exception as e:
             logger.error(f"Error starting client: {e}")
@@ -141,11 +135,11 @@ def main():
     
     try:
         client.start()
-        # Keep the script running
-        while True:
-            time.sleep(1)
     except KeyboardInterrupt:
         logger.info("Stopping client...")
+        client.stop()
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         client.stop()
 
 if __name__ == "__main__":
