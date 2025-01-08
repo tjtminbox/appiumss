@@ -1,0 +1,7 @@
+version: "2"
+authtoken: "2nAjXJ7vWz3xL3uTBSwk3XvcDTJ_2razhm1xnVjnsqZU2YCHf"
+region: "ap"
+tunnels:
+  screenshot-server:
+    proto: http
+    addr: "localhost:5000"
