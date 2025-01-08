@@ -4,12 +4,17 @@ import os
 import base64
 from datetime import datetime
 import socket
+from config import config
 
+# Get environment configuration
+env = os.environ.get('FLASK_ENV', 'development')
 app = Flask(__name__)
+app.config.from_object(config[env])
+
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Ensure screenshots directory exists
-SCREENSHOTS_DIR = 'screenshots'
+SCREENSHOTS_DIR = app.config['SCREENSHOTS_DIR']
 if not os.path.exists(SCREENSHOTS_DIR):
     os.makedirs(SCREENSHOTS_DIR)
 
@@ -68,9 +73,17 @@ def handle_screenshot(data):
         return {'status': 'error', 'message': str(e)}
 
 if __name__ == '__main__':
-    local_ip = get_local_ip()
-    print(f"\nServer running at:")
-    print(f"- Local: http://localhost:5000")
-    print(f"- Network: http://{local_ip}:5000")
-    print("\nShare these URLs with anyone who needs to take screenshots!")
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    if env == 'production':
+        print(f"\nRunning in PRODUCTION mode")
+        socketio.run(app, 
+                    host='0.0.0.0',
+                    port=int(os.environ.get('PORT', 8080)),
+                    debug=False)
+    else:
+        local_ip = get_local_ip()
+        print(f"\nRunning in DEVELOPMENT mode")
+        print(f"Server running at:")
+        print(f"- Local: http://localhost:5000")
+        print(f"- Network: http://{local_ip}:5000")
+        print("\nShare these URLs with anyone who needs to take screenshots!")
+        socketio.run(app, host='0.0.0.0', port=5000, debug=True)
